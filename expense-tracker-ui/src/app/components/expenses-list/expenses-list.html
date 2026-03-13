@@ -1,0 +1,37 @@
+<section class="panel">
+  <div class="panel-header">
+    <h2>Expenses</h2>
+    <div>
+      <button class="btn primary" (click)="create()">+ New</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="lead">Loading...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <table *ngIf="!loading && expenses.length" class="table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th class="right">Amount</th>
+        <th>Category</th>
+        <th>Date</th>
+        <th class="actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let e of expenses">
+        <td>{{ e.title }}</td>
+        <td class="right">{{ e.amt | number:'1.2-2' }}</td>
+        <td>{{ e.category || '-' }}</td>
+        <td>{{ e.date | date:'shortDate' }}</td>
+        <td class="actions">
+          <button class="btn" (click)="edit(e)">Edit</button>
+          <button class="btn danger" (click)="remove(e)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && !expenses.length" class="muted">No expenses yet — create one.</div>
+</section>

@@ -1,0 +1,17 @@
+<header class="header">
+    <div class="container header-inner">
+        <h1 class="logo">Expense Tracker</h1>
+        <nav class="nav">
+            <a routerLink="/expenses" routerLinkActive="active" aria-current="page">Expenses</a>
+            <a routerLink="/expenses/new" routerLinkActive="active">New Expense</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container main">
+    <router-outlet></router-outlet>
+</main>
+
+<footer class="footer">
+    <div class="container">© Expense Tracker</div>
+</footer>

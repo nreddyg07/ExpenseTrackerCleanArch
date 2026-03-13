@@ -1,0 +1,22 @@
+/* List-specific tweaks */
+.panel-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #0b1220;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.table td.actions {
+  white-space: nowrap;
+}
+
+.btn.small {
+  padding: 0.25rem 0.45rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
