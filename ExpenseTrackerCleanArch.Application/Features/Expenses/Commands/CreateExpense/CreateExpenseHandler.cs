@@ -1,30 +1,29 @@
-﻿using ExpenseTrackerCleanArch.Application.Interfaces;
-using ExpenseTrackerCleanArch.Domain.Entities;
+﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
+using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
 
-public class CreateExpenseHandler : IRequestHandler<CreateExpenseCommand, int>
+public class CreateExpenseHandler : IRequestHandler<CreateExpenseCommand, ApiResponse<int>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IExpenseWriteRepository _repository;
 
-    public CreateExpenseHandler(IApplicationDbContext context)
+    public CreateExpenseHandler(IExpenseWriteRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
-    public async Task<int> Handle(CreateExpenseCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<int>> Handle(
+        CreateExpenseCommand request,
+        CancellationToken cancellationToken)
     {
-        var expense = new Expense(
+        var id = await _repository.AddAsync(
             request.Title,
             request.Amt,
             request.Category,
-            request.Date
-        );
+            request.Date,
+            cancellationToken);
 
-        _context.Expenses.Add(expense);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return expense.Id;
+        return ApiResponse<int>.SuccessResponse(id, "Expense created successfully");
     }
 }

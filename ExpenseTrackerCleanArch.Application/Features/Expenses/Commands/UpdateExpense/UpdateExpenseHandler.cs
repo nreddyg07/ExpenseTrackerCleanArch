@@ -1,30 +1,32 @@
-﻿using ExpenseTrackerCleanArch.Application.Interfaces;
+﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
+using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpdateExpense;
 
-public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, bool>
+public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ApiResponse<string>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IExpenseWriteRepository _repository;
 
-    public UpdateExpenseHandler(IApplicationDbContext context)
+    public UpdateExpenseHandler(IExpenseWriteRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
-    public async Task<bool> Handle(UpdateExpenseCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<string>> Handle(
+        UpdateExpenseCommand request,
+        CancellationToken cancellationToken)
     {
-        var expense = await _context.Expenses
-            .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+        await _repository.UpdateAsync(
+            request.Id,
+            request.Title,
+            request.Amt,
+            request.Category,
+            request.Date,
+            cancellationToken);
 
-        if (expense == null)
-            return false;
-
-        expense.Update(request.Title, request.Amt, request.Category, request.Date);
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return true;
+        return ApiResponse<string>.SuccessResponse(
+            "Updated",
+            "Expense updated successfully");
     }
 }
