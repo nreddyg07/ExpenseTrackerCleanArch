@@ -65,14 +65,13 @@ mat-nav-list a {
 mat-nav-list mat-icon {
   margin: 10px;
   font-size: 22px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 15px;
 }
 
 /* Text styling */
 mat-nav-list span {
+  text-overflow: ellipsis;
+  overflow: hidden;
   font-size: 15px;
   white-space: nowrap;
 }

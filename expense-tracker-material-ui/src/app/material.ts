@@ -11,6 +11,9 @@ import { MatToolbar } from "@angular/material/toolbar";
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
 
 export const MATERIAL_MODULES = [
   MatToolbar,
@@ -25,5 +28,8 @@ export const MATERIAL_MODULES = [
   MatNativeDateModule,
   MatSidenavModule,
   MatListModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatCheckboxModule,
+  MatSelectModule,
+  FormsModule
 ];

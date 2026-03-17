@@ -59,7 +59,7 @@
         mat-raised-button
         color="primary"
         type="submit"
-        [disabled]="form.invalid">
+        [disabled]="form.invalid || (id && !hasRealChanges())">
 
         {{ id ? 'Update' : 'Create' }}
 
