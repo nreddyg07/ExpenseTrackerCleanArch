@@ -1,3 +1,4 @@
+using ExpenseTrackerCleanArch.Application.Features.Expenses;
 using ExpenseTrackerCleanArch.Application.Interfaces;
 
 using ExpenseTrackerCleanArch.Domain.Entities;
@@ -70,4 +71,28 @@ public class EfExpenseWriteRepository : IExpenseWriteRepository
 
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<int> DeleteMultipleAsync(List<int> ids,  CancellationToken cancellationToken)
+    {
+        var expenses = await _context.Expenses
+            .Where(e => ids.Contains(e.Id))
+            .ToListAsync(cancellationToken);
+
+        if (!expenses.Any())
+            return 0;
+
+        _context.Expenses.RemoveRange(expenses);
+
+        return await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    //public Task UpdateAsync(ExpenseDto existing, CancellationToken cancellationToken)
+    //{
+    //    throw new NotImplementedException();
+    //}
+
+    //public Task AddAsync(Expense expense, CancellationToken cancellationToken)
+    //{
+    //    throw new NotImplementedException();
+    //}
 }

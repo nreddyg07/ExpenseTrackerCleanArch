@@ -7,7 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(
+    c =>
+    {
+        c.OrderActionsBy(apiDesc => apiDesc.RelativePath);
+    });
 
 builder.Services.AddApplication();
 
@@ -23,6 +27,7 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
+
 
 var app = builder.Build();
 
