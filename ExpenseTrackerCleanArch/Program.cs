@@ -1,19 +1,17 @@
+using ExpenseTrackerCleanArch.API.Middleware;
 using ExpenseTrackerCleanArch.Application;
 using ExpenseTrackerCleanArch.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
 builder.Services.AddControllers();
-
-// Register Application layer (MediatR etc.)
-builder.Services.AddApplication();
-
-// Register Infrastructure layer (DbContext, SQL Server etc.)
-builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddApplication();
+
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddCors(options =>
 {
@@ -30,7 +28,8 @@ var app = builder.Build();
 
 app.UseCors("AllowAngular");
 
-// Configure middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -38,9 +37,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

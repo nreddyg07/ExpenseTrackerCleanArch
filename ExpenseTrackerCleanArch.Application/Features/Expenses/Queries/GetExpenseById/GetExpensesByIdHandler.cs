@@ -1,34 +1,32 @@
-﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.DTOs;
+﻿using ExpenseTrackerCleanArch.Application.Common.Exceptions;
+using ExpenseTrackerCleanArch.Application.Common.Responses;
+using ExpenseTrackerCleanArch.Application.Features.Expenses;
+
 using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Queries.GetExpenseById;
 
-public class GetExpenseByIdHandler
-    : IRequestHandler<GetExpenseByIdQuery, ExpenseDto?>
+public class GetExpenseByIdHandler : IRequestHandler<GetExpenseByIdQuery, ApiResponse<ExpenseDto>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IExpenseReadRepository _repository;
 
-    public GetExpenseByIdHandler(IApplicationDbContext context)
+    public GetExpenseByIdHandler(IExpenseReadRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
 
-    public async Task<ExpenseDto?> Handle(
+    public async Task<ApiResponse<ExpenseDto>> Handle(
         GetExpenseByIdQuery request,
         CancellationToken cancellationToken)
     {
-        return await _context.Expenses
-            .Where(x => x.Id == request.Id)
-            .Select(x => new ExpenseDto
-            {
-                Id = x.Id,
-                Title = x.Title,
-                Amt = x.Amt,
-                Category = x.Category,
-                Date = x.Date
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+        var expense = await _repository.GetByIdAsync(request.Id, cancellationToken);
+
+        if (expense == null)
+            throw new NotFoundException($"Expense with id {request.Id} not found");
+
+        return ApiResponse<ExpenseDto>.SuccessResponse(
+            expense,
+            "Expense retrieved successfully");
     }
 }

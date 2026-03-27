@@ -1,0 +1,43 @@
+<mat-sidenav-container class="sidenav-container" [class.collapsed]="collapsed">
+
+  <mat-sidenav
+    #sidenav
+    mode="side"
+    [opened]="true"
+    class="sidenav"
+    [class.collapsed]="collapsed"
+  >
+
+    <div class="sidebar-header">
+      <button mat-icon-button (click)="toggleSidebar()">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span class="title" *ngIf="!collapsed">Expense Tracker</span>
+    </div>
+
+    <mat-nav-list>
+
+      <a mat-list-item routerLink="/expenses">
+        <mat-icon>list</mat-icon>
+        <span *ngIf="!collapsed">Expenses</span>
+      </a>
+
+      <a mat-list-item routerLink="/new">
+        <mat-icon>add</mat-icon>
+        <span *ngIf="!collapsed">New Expense</span>
+      </a>
+
+    </mat-nav-list>
+
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+
+  </mat-sidenav-content>
+
+</mat-sidenav-container>
