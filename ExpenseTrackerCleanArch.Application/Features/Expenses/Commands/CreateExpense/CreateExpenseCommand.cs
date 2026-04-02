@@ -8,4 +8,4 @@ public record CreateExpenseCommand(
     decimal Amt,
     string Category,
     DateTime Date
-) : IRequest<ApiResponse<int>>;
+) : IRequest<ApiResponse<ExpenseDto>>;

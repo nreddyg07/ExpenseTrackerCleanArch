@@ -9,4 +9,4 @@ public record UpdateExpenseCommand(
     decimal Amt,
     string Category,
     DateTime Date
-) : IRequest<ApiResponse<string>>;
+) : IRequest<ApiResponse<ExpenseDto>>;

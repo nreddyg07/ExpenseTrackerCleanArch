@@ -25,7 +25,7 @@ mat-header-cell th{
 }
 
 mat-form-field{
-  width: 300px;
+  width: 200px;
   height: 50px;
   padding: 0px 5px;
 }
@@ -37,7 +37,7 @@ mat-form-field{
 
 .container {
   height: 100vh;
-  width: 2000px;
+  width: 7000px;
 }
 
 mat-drawer {

@@ -56,14 +56,24 @@
 
     <!-- Date -->
     <mat-form-field appearance="outline" floatLabel="always" class="full-width">
-      <mat-label>Date</mat-label>
-      <input matInput [matDatepicker]="picker" formControlName="date">
-      <mat-datepicker #picker></mat-datepicker>
+  <mat-label>Date</mat-label>
 
-      <mat-error *ngIf="form.get('date')?.hasError('required')">
-        Date is required
-      </mat-error>
-    </mat-form-field>
+  <input 
+    matInput 
+    [matDatepicker]="picker" 
+    formControlName="date"
+    readonly>
+
+  <!-- Toggle button (calendar icon) -->
+  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+
+  <!-- Datepicker panel -->
+  <mat-datepicker #picker></mat-datepicker>
+
+  <mat-error *ngIf="form.get('date')?.hasError('required')">
+    Date is required
+  </mat-error>
+</mat-form-field>
 
     <!-- Buttons -->
     <div class="button-group">

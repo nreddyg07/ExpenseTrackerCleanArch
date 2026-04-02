@@ -1,19 +1,23 @@
 ﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
+using ExpenseTrackerCleanArch.Application.Features.Expenses;
+using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
 using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
 
-namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
-
-public class CreateExpenseHandler : IRequestHandler<CreateExpenseCommand, ApiResponse<int>>
+public class CreateExpenseHandler : IRequestHandler<CreateExpenseCommand, ApiResponse<ExpenseDto>>
 {
     private readonly IExpenseWriteRepository _repository;
+    private readonly IExpenseReadRepository _readRepository;
 
-    public CreateExpenseHandler(IExpenseWriteRepository repository)
+    public CreateExpenseHandler(
+        IExpenseWriteRepository repository,
+        IExpenseReadRepository readRepository)
     {
         _repository = repository;
+        _readRepository = readRepository;
     }
 
-    public async Task<ApiResponse<int>> Handle(
+    public async Task<ApiResponse<ExpenseDto>> Handle(
         CreateExpenseCommand request,
         CancellationToken cancellationToken)
     {
@@ -24,6 +28,10 @@ public class CreateExpenseHandler : IRequestHandler<CreateExpenseCommand, ApiRes
             request.Date,
             cancellationToken);
 
-        return ApiResponse<int>.SuccessResponse(id, "Expense created successfully");
+        var expense = await _readRepository.GetByIdAsync(id, cancellationToken);
+
+        return ApiResponse<ExpenseDto>.SuccessResponse(
+            expense!,
+            "Expense created successfully");
     }
 }
