@@ -23,10 +23,10 @@
         <span *ngIf="!collapsed">Expenses</span>
       </a>
 
-      <a mat-list-item routerLink="/new">
-        <mat-icon>add</mat-icon>
-        <span *ngIf="!collapsed">New Expense</span>
-      </a>
+      <a mat-list-item (click)="openNewExpense()">
+  <mat-icon>add</mat-icon>
+  <span *ngIf="!collapsed">New Expense</span>
+</a>
 
     </mat-nav-list>
 

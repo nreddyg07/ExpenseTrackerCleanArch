@@ -1,42 +1,28 @@
-﻿using Dapper;
-using ExpenseTrackerCleanArch.Application.Features.Expenses;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.DTOs;
 using ExpenseTrackerCleanArch.Application.Interfaces;
-using System.Data;
+using ExpenseTrackerCleanArch.Infrastructure.Persistence.QueryHelpers;
 
 namespace ExpenseTrackerCleanArch.Infrastructure.Persistence;
 
 public class DapperExpenseReadRepository : IExpenseReadRepository
 {
-    private readonly ISqlConnectionFactory _connectionFactory;
+    private readonly IQueryHelper _queryHelper;
 
-    public DapperExpenseReadRepository(ISqlConnectionFactory connectionFactory)
+    public DapperExpenseReadRepository(IQueryHelper queryHelper)
     {
-        _connectionFactory = connectionFactory;
+        _queryHelper = queryHelper;
     }
 
-    public async Task<IEnumerable<ExpenseDto>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<ExpenseDto>> GetAllAsync(CancellationToken ct)
     {
-        using var connection = _connectionFactory.CreateConnection();
-
-        var sql = @"SELECT Id, Title, Amt, Category, Date FROM Expenses";
-
-        var result = await connection.QueryAsync<ExpenseDto>(sql);
-
-        return result;
+        return await _queryHelper.QueryAsync<ExpenseDto>("GetAllExpenses.sql");
     }
 
-    public async Task<ExpenseDto?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<ExpenseDto?> GetByIdAsync(int id, CancellationToken ct)
     {
-        using var connection = _connectionFactory.CreateConnection();
-
-        var sql = @"SELECT Id, Title, Amt, Category, Date 
-                    FROM Expenses 
-                    WHERE Id = @Id";
-
-        var result = await connection.QueryFirstOrDefaultAsync<ExpenseDto>(
-            sql,
-            new { Id = id });
-
-        return result;
+        return await _queryHelper.QueryFirstAsync<ExpenseDto>(
+            "GetExpenseById.sql",
+            new { Id = id }
+        );
     }
 }

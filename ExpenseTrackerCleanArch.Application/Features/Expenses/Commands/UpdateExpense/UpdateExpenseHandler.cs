@@ -1,10 +1,10 @@
-﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpdateExpense;
 using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpdateExpense;
 
-public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ApiResponse<string>>
+public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, bool>
 {
     private readonly IExpenseWriteRepository _repository;
 
@@ -13,20 +13,16 @@ public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ApiRes
         _repository = repository;
     }
 
-    public async Task<ApiResponse<string>> Handle(
-        UpdateExpenseCommand request,
-        CancellationToken cancellationToken)
+    public async Task<bool> Handle(UpdateExpenseCommand request, CancellationToken ct)
     {
-        await _repository.UpdateAsync(
+        var rowsAffected = await _repository.UpdateAsync(
             request.Id,
             request.Title,
             request.Amt,
             request.Category,
             request.Date,
-            cancellationToken);
+            ct);
 
-        return ApiResponse<string>.SuccessResponse(
-            "Updated",
-            "Expense updated successfully");
+        return rowsAffected > 0;
     }
 }

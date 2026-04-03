@@ -1,59 +1,80 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.DTOs;
+using ExpenseTrackerCleanArch.Application.Features.Expenses;
 using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpdateExpense;
+using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpsertExpense;
+using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
 using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteExpense;
-using ExpenseTrackerCleanArch.Application.Features.Expenses.Queries.GetExpenseById;
-using ExpenseTrackerCleanArch.Application.Features.Expenses.Queries.GetAllExpenses;
-
-namespace ExpenseTrackerCleanArch.API.Controllers;
+using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteMultipleExpense;
+using ExpenseTrackerCleanArch.Application.Interfaces;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/[controller]")]
-public class ExpensesController : ControllerBase
+[Route("[controller]/[action]")]
+public class ExpensesController(IExpenseServiceWrapper service) : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IExpenseServiceWrapper _service=service;
 
-    public ExpensesController(IMediator mediator)
+    [HttpGet]
+    public async Task<Ok<IEnumerable<ExpenseDto>>> GetAll(CancellationToken ct)
     {
-        _mediator = mediator;
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateExpenseCommand command)
-    {
-        var result = await _mediator.Send(command);
-        return Ok(result);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateExpenseCommand command)
-    {
-        if (id != command.Id)
-            return BadRequest();
-
-        var result = await _mediator.Send(command);
-        return Ok(result);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var result = await _mediator.Send(new DeleteExpenseCommand(id));
-        return Ok(result);
+        var data = await _service.Queries.GetAllAsync(ct);
+        return TypedResults.Ok(data);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<Results<Ok<ExpenseDto>, NotFound>> GetById([FromQuery]int id, CancellationToken ct)
     {
-        var result = await _mediator.Send(new GetAllExpensesQuery());
-        return Ok(result);
+        var data = await _service.Queries.GetByIdAsync(id, ct);
+
+        //if data is null, return 404
+        if (data is null)
+            return TypedResults.NotFound();
+
+        return TypedResults.Ok(data);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpPost]
+    public async Task<Ok<bool>> Create([FromBody]CreateExpenseCommand command)
     {
-        var result = await _mediator.Send(new GetExpenseByIdQuery(id));
-        return Ok(result);
+        var result = await _service.Mediator.Send(command);
+        return TypedResults.Ok(result);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<Results<Ok<bool>, BadRequest<string>>> Update(int id, UpdateExpenseCommand command)
+    {
+        if (id != command.Id)
+            return TypedResults.BadRequest("ID mismatch between URL and body.");
+
+        var result = await _service.Mediator.Send(command);
+        return TypedResults.Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<Ok<bool>> Delete(int id)
+    {
+        var result = await _service.Mediator.Send(new DeleteExpenseCommand(id));
+        return TypedResults.Ok(result);
+    }
+
+    [HttpDelete("multipleDelete")]
+    public async Task<Ok<bool>> DeleteMultiple([FromBody] List<int> ids)
+    {
+        var result = await _service.Mediator.Send(new DeleteMultipleExpensesCommand { Ids = ids });
+        return TypedResults.Ok(result);
+    }
+
+    [HttpPost("upsert-multiple")]
+    public async Task<Results<Ok<bool>, BadRequest<string>>> UpsertMultiple([FromBody] UpsertMultipleExpensesCommand command)
+    {
+        var success = await _service.Mediator.Send(command);
+
+        if (!success)
+            return TypedResults.BadRequest("No changes were made or invalid data provided.");
+
+        return TypedResults.Ok(true);
     }
 }

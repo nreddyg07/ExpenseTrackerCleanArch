@@ -1,6 +1,7 @@
+using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpdateExpense;
 using FluentValidation;
 
-namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpdateExpense;
+namespace ExpenseTrackerCleanArch.Application.Validators;
 
 public class UpdateExpenseValidator
     : AbstractValidator<UpdateExpenseCommand>

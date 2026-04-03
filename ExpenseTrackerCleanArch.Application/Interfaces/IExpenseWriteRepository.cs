@@ -1,25 +1,19 @@
-﻿using System.Threading;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.DTOs;
 
 namespace ExpenseTrackerCleanArch.Application.Interfaces;
 
 public interface IExpenseWriteRepository
 {
-    Task<int> AddAsync(
-        string title,
-        decimal amt,
-        string category,
-        DateTime date,
-        CancellationToken cancellationToken);
+    Task<int> AddAsync(string title, decimal amt, string category, DateTime date, CancellationToken ct);
 
-    Task UpdateAsync(
-        int id,
-        string title,
-        decimal amt,
-        string category,
-        DateTime date,
-        CancellationToken cancellationToken);
+    Task<int> UpdateAsync(int id, string title, decimal amt, string category, DateTime date, CancellationToken ct);
 
-    Task DeleteAsync(
-        int id,
-        CancellationToken cancellationToken);
+    Task<int> DeleteAsync(int id, CancellationToken ct);
+
+    Task<int> DeleteMultipleAsync(List<int> ids, CancellationToken ct);
+
+    // Keeping these as DTOs since they are for bulk operations
+    Task<int> AddMultipleAsync(IEnumerable<ExpenseDto> expenses, CancellationToken ct);
+
+    Task<int> UpdateMultipleAsync(IEnumerable<ExpenseDto> expenses, CancellationToken ct);
 }

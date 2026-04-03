@@ -1,3 +1,4 @@
+using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
 using FluentValidation;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;

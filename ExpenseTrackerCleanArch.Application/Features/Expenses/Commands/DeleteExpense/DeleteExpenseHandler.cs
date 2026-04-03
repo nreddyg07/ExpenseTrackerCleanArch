@@ -1,10 +1,10 @@
-﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteExpense;
 using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteExpense;
 
-public class DeleteExpenseHandler : IRequestHandler<DeleteExpenseCommand, ApiResponse<string>>
+public class DeleteExpenseHandler : IRequestHandler<DeleteExpenseCommand, bool>
 {
     private readonly IExpenseWriteRepository _repository;
 
@@ -13,14 +13,10 @@ public class DeleteExpenseHandler : IRequestHandler<DeleteExpenseCommand, ApiRes
         _repository = repository;
     }
 
-    public async Task<ApiResponse<string>> Handle(
-        DeleteExpenseCommand request,
-        CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteExpenseCommand request, CancellationToken ct)
     {
-        await _repository.DeleteAsync(request.Id, cancellationToken);
+        var rowsAffected = await _repository.DeleteAsync(request.Id, ct);
 
-        return ApiResponse<string>.SuccessResponse(
-            "Deleted",
-            "Expense deleted successfully");
+        return rowsAffected > 0;
     }
 }
