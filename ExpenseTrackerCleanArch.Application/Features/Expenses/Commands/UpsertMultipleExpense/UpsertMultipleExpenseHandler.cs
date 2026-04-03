@@ -1,46 +1,37 @@
-﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
-using ExpenseTrackerCleanArch.Application.Features.Expenses;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.DTOs;
 using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpsertExpense;
+using ExpenseTrackerCleanArch.Domain.Entities;
 using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
 
+namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpsertExpense;
+
 public class UpsertMultipleExpensesHandler
-    : IRequestHandler<UpsertMultipleExpensesCommand, ApiResponse<IEnumerable<ExpenseDto>>>
+    : IRequestHandler<UpsertMultipleExpensesCommand, bool>
 {
     private readonly IExpenseWriteRepository _repoWrite;
-    private readonly IExpenseReadRepository _readRepo;
 
-    public UpsertMultipleExpensesHandler(
-        IExpenseWriteRepository repoWrite,
-        IExpenseReadRepository readRepo)
+    public UpsertMultipleExpensesHandler(IExpenseWriteRepository repoWrite)
     {
         _repoWrite = repoWrite;
-        _readRepo = readRepo;
     }
 
-    public async Task<ApiResponse<IEnumerable<ExpenseDto>>> Handle(
-        UpsertMultipleExpensesCommand request,
-        CancellationToken cancellationToken)
+    public async Task<bool> Handle(UpsertMultipleExpensesCommand request, CancellationToken ct)
     {
         if (request.Expenses == null || !request.Expenses.Any())
-            return ApiResponse<IEnumerable<ExpenseDto>>.FailResponse("Invalid");
+            return false;
 
-        foreach (var e in request.Expenses)
-        {
-            if (e.Id == 0)
-            {
-                await _repoWrite.AddAsync(e.Title, e.Amt, e.Category, e.Date, cancellationToken);
-            }
-            else
-            {
-                await _repoWrite.UpdateAsync(e.Id, e.Title, e.Amt, e.Category, e.Date, cancellationToken);
-            }
-        }
+        var toAdd = request.Expenses.Where(e => e.Id == 0).ToList();
+        var toUpdate = request.Expenses.Where(e => e.Id != 0).ToList();
 
-        var updatedList = await _readRepo.GetAllAsync(cancellationToken);
+        int rowsAffected = 0;
 
-        return ApiResponse<IEnumerable<ExpenseDto>>.SuccessResponse(
-            updatedList,
-            "Upsert completed");
+        if (toAdd.Any())
+            rowsAffected += await _repoWrite.AddMultipleAsync(toAdd, ct);
+
+        if (toUpdate.Any())
+            rowsAffected += await _repoWrite.UpdateMultipleAsync(toUpdate, ct);
+
+        return rowsAffected > 0;
     }
 }

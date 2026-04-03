@@ -1,37 +1,27 @@
-﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
-using ExpenseTrackerCleanArch.Application.Features.Expenses;
-using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
 using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
 
-public class CreateExpenseHandler : IRequestHandler<CreateExpenseCommand, ApiResponse<ExpenseDto>>
+namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
+
+public class CreateExpenseHandler : IRequestHandler<CreateExpenseCommand, bool>
 {
     private readonly IExpenseWriteRepository _repository;
-    private readonly IExpenseReadRepository _readRepository;
 
-    public CreateExpenseHandler(
-        IExpenseWriteRepository repository,
-        IExpenseReadRepository readRepository)
+    public CreateExpenseHandler(IExpenseWriteRepository repository)
     {
         _repository = repository;
-        _readRepository = readRepository;
     }
 
-    public async Task<ApiResponse<ExpenseDto>> Handle(
-        CreateExpenseCommand request,
-        CancellationToken cancellationToken)
+    public async Task<bool> Handle(CreateExpenseCommand request, CancellationToken ct)
     {
-        var id = await _repository.AddAsync(
+        var rowsAffected = await _repository.AddAsync(
             request.Title,
             request.Amt,
             request.Category,
             request.Date,
-            cancellationToken);
+            ct);
 
-        var expense = await _readRepository.GetByIdAsync(id, cancellationToken);
-
-        return ApiResponse<ExpenseDto>.SuccessResponse(
-            expense!,
-            "Expense created successfully");
+        return rowsAffected > 0;
     }
 }

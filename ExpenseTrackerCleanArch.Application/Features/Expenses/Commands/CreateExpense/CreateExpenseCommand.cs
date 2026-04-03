@@ -1,5 +1,4 @@
-﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
-using MediatR;
+﻿using MediatR;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.CreateExpense;
 
@@ -8,4 +7,4 @@ public record CreateExpenseCommand(
     decimal Amt,
     string Category,
     DateTime Date
-) : IRequest<ApiResponse<ExpenseDto>>;
+) : IRequest<bool>;

@@ -1,3 +1,4 @@
+using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteExpense;
 using FluentValidation;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteExpense;

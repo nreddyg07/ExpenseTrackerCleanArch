@@ -1,10 +1,7 @@
-﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.DTOs;
 using MediatR;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpsertExpense;
 
-public class UpsertMultipleExpensesCommand
-    : IRequest<ApiResponse<IEnumerable<ExpenseDto>>>
-{
-    public List<ExpenseDto> Expenses { get; set; } = new();
-}
+public record UpsertMultipleExpensesCommand(List<ExpenseDto> Expenses)
+    : IRequest<bool>;

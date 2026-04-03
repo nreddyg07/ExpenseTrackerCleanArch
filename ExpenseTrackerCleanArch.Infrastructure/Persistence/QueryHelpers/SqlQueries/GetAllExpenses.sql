@@ -1,7 +1,7 @@
 ﻿SELECT 
     Id,
     Title,
-    Amt AS Amount,
+    Amt,
     Category,
     Date
 FROM Expenses;

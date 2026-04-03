@@ -1,4 +1,4 @@
-using ExpenseTrackerCleanArch.Application.Features.Expenses;
+using ExpenseTrackerCleanArch.Application.Features.Expenses.DTOs;
 
 namespace ExpenseTrackerCleanArch.Application.Interfaces;
 

@@ -1,4 +1,4 @@
-﻿using ExpenseTrackerCleanArch.Application.Features.Expenses;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.DTOs;
 using ExpenseTrackerCleanArch.Application.Interfaces;
 using ExpenseTrackerCleanArch.Infrastructure.Persistence.QueryHelpers;
 

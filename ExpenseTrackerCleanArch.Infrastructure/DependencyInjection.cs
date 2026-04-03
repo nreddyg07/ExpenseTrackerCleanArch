@@ -16,6 +16,7 @@ public static class DependencyInjection
 
         services.AddScoped<IQueryContext, QueryContext>();
         services.AddScoped<IQueryHelper, QueryHelper>();
+        services.AddScoped<IExpenseServiceWrapper, ExpenseServiceWrapper>();
 
         services.AddScoped<IExpenseReadRepository, DapperExpenseReadRepository>();
         services.AddDbContext<AppDbContext>(options =>

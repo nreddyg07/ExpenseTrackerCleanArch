@@ -14,7 +14,7 @@ import { StagingService } from '../../services/staging.service';
 import { signal, computed } from '@angular/core';
 import { catchError, of } from 'rxjs';
 import { ExpenseFormComponent } from '../expense-form/expense-form';
-import { StagingApiResult } from '../../models/staging-api-result';
+import { StagingApiResult } from '../../models/staging-result';
 import { MatMenuModule } from '@angular/material/menu';
 import { SafeHtml, DomSanitizer } from '@angular/platform-browser';
 
@@ -305,42 +305,39 @@ saveAllChanges(): void {
 
   const observables: Array<Observable<StagingApiResult>> = [];
 
+  // 1. Handle Adds and Updates
   if (upsertPayload.length > 0) {
     observables.push(
       this.service.upsertMultiple(upsertPayload).pipe(
         map(res => ({ type: 'upsert', response: res } as StagingApiResult)),
-        catchError(err =>
-          of({ type: 'upsert', error: true, message: err.message } as StagingApiResult)
-        )
+        catchError(err => of({ type: 'upsert', error: true, message: err.message } as StagingApiResult))
       )
     );
   }
 
+  // 2. Handle Deletions (The "Delete Thing")
   if (validDeletedIds.length > 0) {
     observables.push(
       this.service.deleteMultiple(validDeletedIds).pipe(
         map(res => ({ type: 'delete', response: res } as StagingApiResult)),
-        catchError(err =>
-          of({ type: 'delete', error: true, message: err.message } as StagingApiResult)
-        )
+        catchError(err => of({ type: 'delete', error: true, message: err.message } as StagingApiResult))
       )
     );
   }
 
+  // 3. Execute all together
   this.saveSub = forkJoin(observables).subscribe((results: StagingApiResult[]) => {
-    const hasError = results.some(r => r.error);
+    const hasError = results.some(r => r.error || r.response === false);
 
     if (hasError) {
-      this.snackBar.open('All changes saved successfully!', 'Close', { duration: 3000 });
+      this.snackBar.open('Some changes failed to save. Please check your connection.', 'Close', { duration: 4000 });
     } else {
       this.snackBar.open('All changes saved successfully!', 'Close', { duration: 3000 });
+      this.staging.clear(); // Only clear if successful
+      this.load(); // Refresh list from backend
     }
-
-    this.staging.clear();
-    this.load();
   });
 }
-
   get hasUnsavedChanges(): boolean {
     return this.staging.created.length > 0 ||
       this.staging.updated.length > 0 ||

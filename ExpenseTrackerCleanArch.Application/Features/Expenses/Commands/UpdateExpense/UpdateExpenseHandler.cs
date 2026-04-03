@@ -1,38 +1,28 @@
-﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
-using ExpenseTrackerCleanArch.Application.Features.Expenses;
-using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpdateExpense;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpdateExpense;
 using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
 
-public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, ApiResponse<ExpenseDto>>
+namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.UpdateExpense;
+
+public class UpdateExpenseHandler : IRequestHandler<UpdateExpenseCommand, bool>
 {
     private readonly IExpenseWriteRepository _repository;
-    private readonly IExpenseReadRepository _readRepository;
 
-    public UpdateExpenseHandler(
-        IExpenseWriteRepository repository,
-        IExpenseReadRepository readRepository)
+    public UpdateExpenseHandler(IExpenseWriteRepository repository)
     {
         _repository = repository;
-        _readRepository = readRepository;
     }
 
-    public async Task<ApiResponse<ExpenseDto>> Handle(
-        UpdateExpenseCommand request,
-        CancellationToken cancellationToken)
+    public async Task<bool> Handle(UpdateExpenseCommand request, CancellationToken ct)
     {
-        await _repository.UpdateAsync(
+        var rowsAffected = await _repository.UpdateAsync(
             request.Id,
             request.Title,
             request.Amt,
             request.Category,
             request.Date,
-            cancellationToken);
+            ct);
 
-        var updated = await _readRepository.GetByIdAsync(request.Id, cancellationToken);
-
-        return ApiResponse<ExpenseDto>.SuccessResponse(
-            updated!,
-            "Expense updated successfully");
+        return rowsAffected > 0;
     }
 }

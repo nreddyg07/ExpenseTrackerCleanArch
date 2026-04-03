@@ -1,10 +1,9 @@
-﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
-using MediatR;
+﻿using MediatR;
 
 namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteMultipleExpense;
 
 public class DeleteMultipleExpensesCommand
-    : IRequest<ApiResponse<IEnumerable<ExpenseDto>>>
+    : IRequest<bool>
 {
     public List<int> Ids { get; set; } = new();
 }

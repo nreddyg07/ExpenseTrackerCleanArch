@@ -1,37 +1,25 @@
-﻿using ExpenseTrackerCleanArch.Application.Common.Responses;
-using ExpenseTrackerCleanArch.Application.Features.Expenses;
-using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteMultipleExpense;
+﻿using ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteMultipleExpense;
 using ExpenseTrackerCleanArch.Application.Interfaces;
 using MediatR;
 
-public class DeleteMultipleExpensesHandler
-    : IRequestHandler<DeleteMultipleExpensesCommand, ApiResponse<IEnumerable<ExpenseDto>>>
+namespace ExpenseTrackerCleanArch.Application.Features.Expenses.Commands.DeleteMultipleExpense;
+
+public class DeleteMultipleExpensesHandler : IRequestHandler<DeleteMultipleExpensesCommand, bool>
 {
     private readonly IExpenseWriteRepository _repository;
-    private readonly IExpenseReadRepository _readRepository;
 
-    public DeleteMultipleExpensesHandler(
-        IExpenseWriteRepository repository,
-        IExpenseReadRepository readRepository)
+    public DeleteMultipleExpensesHandler(IExpenseWriteRepository repository)
     {
         _repository = repository;
-        _readRepository = readRepository;
     }
 
-    public async Task<ApiResponse<IEnumerable<ExpenseDto>>> Handle(
-        DeleteMultipleExpensesCommand request,
-        CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteMultipleExpensesCommand request, CancellationToken ct)
     {
         if (request.Ids == null || !request.Ids.Any())
-            return ApiResponse<IEnumerable<ExpenseDto>>.FailResponse("Invalid Request");
+            return false;
 
-        var all = await _readRepository.GetAllAsync(cancellationToken);
-        var toDelete = all.Where(x => request.Ids.Contains(x.Id)).ToList();
+        var rowsAffected = await _repository.DeleteMultipleAsync(request.Ids, ct);
 
-        await _repository.DeleteMultipleAsync(request.Ids, cancellationToken);
-
-        return ApiResponse<IEnumerable<ExpenseDto>>.SuccessResponse(
-            toDelete,
-            "Expenses deleted successfully");
+        return rowsAffected > 0;
     }
 }
